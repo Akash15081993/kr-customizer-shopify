@@ -2,7 +2,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { shopifyGraphQLFetch } from "@/lib/shopifyGraphQLFetch";
 import { getValidSession } from "@/lib/session";
-import { NextApiResponse } from "next";
 import langEng from "@/lang/en";
 import { ShopInfo } from "@/lib/shopInfo";
 
@@ -36,7 +35,8 @@ function convertToString(value: any): string {
   return String(value);
 }
 
-export async function POST(request: NextRequest, res: NextApiResponse) {
+// ✅ FIXED: Remove NextApiResponse parameter
+export async function POST(request: NextRequest) {
   
   try {
 

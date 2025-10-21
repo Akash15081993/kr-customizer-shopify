@@ -2,7 +2,9 @@ SHOPIFY_API_KEY=cc7ed34fdd23728e1172722cfdd631e5
 SHOPIFY_API_SECRET=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
 SHOPIFY_API_SCOPES=read_orders,read_products,write_products,read_script_tags,write_script_tags,write_draft_orders
 SHOPIFY_APP_URL=https://shopify.krcustomizer.com/
-DATABASE_URL="mysql://root:@localhost/admin_shopify"
+DATABASE_URL="mysql://admin_shopify:Shopify@2025@localhost/admin_shopify"
+#DATABASE_URL="mysql://root:@localhost/admin_shopify"
+
 
 ##For install App
 #https://store-001-8737.myshopify.com/admin/oauth/install?client_id=ed3db2f9f372ad8d8aef3b2fed369c1d
