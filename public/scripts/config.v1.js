@@ -104,7 +104,7 @@ var krAppConfig = window?.krcustomizer_config;
 console.log("krAppConfig", krAppConfig);
 
 var kr_endpoint = "https://app.krcustomizer.com/";
-var kr_endpoint_app = "https://www.scchs.co.in/";
+var kr_endpoint_app = "https://shopify.krcustomizer.com/";
 var kr_store_hash = krAppConfig?.shopId;
 var kr_shop = krAppConfig?.shop;
 var kr_page_type = getPageType();
