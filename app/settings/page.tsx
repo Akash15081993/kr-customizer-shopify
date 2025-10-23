@@ -22,6 +22,7 @@ interface SettingsData {
   enableShare: boolean;
   designerButtonName: string;
   designerButton: string;
+  addtocartForm: string;
   cssCode: string;
 }
 
@@ -37,6 +38,7 @@ const Settings = () => {
     enableShare: false,
     designerButtonName: "Customize",
     designerButton: "",
+    addtocartForm: "",
     cssCode: ".example-css-custom{color:red;}",
   });
 
@@ -71,6 +73,7 @@ const Settings = () => {
         enableShare: result.data?.enableShare || false,
         designerButtonName: result.data?.designerButtonName || "Customize",
         designerButton: result.data?.designerButton || "",
+        addtocartForm: result.data?.addtocartForm || "",
         cssCode: result.data?.cssCode || ".example-css-custom{color:red;}",
       });
     } catch (error: any) {
@@ -92,13 +95,26 @@ const Settings = () => {
     }));
   };
 
+  // const handleInputChange =
+  //   (field: keyof SettingsData) => (e: React.ChangeEvent<HTMLInputElement>) => {
+  //     setSettings((prev) => ({
+  //       ...prev,
+  //       [field]: e.target.value || "", // Ensure empty string instead of null
+  //     }));
+  // };
+
+
   const handleInputChange =
     (field: keyof SettingsData) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      const hasHtml = /<[^>]*>/.test(value);
+      const cleanValue = value.replace(/<[^>]*>/g, '');
       setSettings((prev) => ({
         ...prev,
-        [field]: e.target.value || "", // Ensure empty string instead of null
+        [field]: cleanValue || "",
       }));
-    };
+  };
+  
 
   const validateCss = (value: string | undefined): string => {
     if (!value) return "";
@@ -107,26 +123,29 @@ const Settings = () => {
       return `CSS exceeds ${MAX_LENGTH} characters`;
     }
 
-    // Define what's actually dangerous
-    const blacklist = [
-      "javascript:",
-      "data:text/html",
-      "expression(",
-      "eval(",
-      "</style>",
-      "<script",
-      "onload=",
-      "onerror=",
-      "onclick=",
-      "url('data:",
-      "@import url(",
+    // Check for HTML tags
+    const hasHtmlTags = /<[^>]*>/.test(value);
+    if (hasHtmlTags) {
+      return "HTML tags are not allowed in CSS";
+    }
+
+    // Define dangerous patterns that could execute code
+    const dangerousPatterns = [
+      { pattern: /javascript:/i, message: "JavaScript URLs are not allowed" },
+      { pattern: /data:text\/html/i, message: "Data URLs with HTML are not allowed" },
+      { pattern: /expression\(/i, message: "CSS expressions are not allowed" },
+      { pattern: /eval\(/i, message: "eval function is not allowed" },
+      { pattern: /<script/i, message: "Script tags are not allowed" },
+      { pattern: /onload=/i, message: "onload events are not allowed" },
+      { pattern: /onerror=/i, message: "onerror events are not allowed" },
+      { pattern: /onclick=/i, message: "onclick events are not allowed" },
+      { pattern: /url\(['"]?data:/i, message: "Data URLs in url() are not allowed" },
+      { pattern: /@import\s+url\(/i, message: "URL imports are not allowed" },
     ];
 
-    const lowerValue = value.toLowerCase();
-
-    for (const dangerous of blacklist) {
-      if (lowerValue.includes(dangerous)) {
-        return `Unsafe CSS detected: "${dangerous}" is not allowed`;
+    for (const { pattern, message } of dangerousPatterns) {
+      if (pattern.test(value)) {
+        return `Unsafe CSS: ${message}`;
       }
     }
 
@@ -167,6 +186,7 @@ const Settings = () => {
           enableShare: settings.enableShare,
           designerButtonName: settings.designerButtonName || "Customize",
           designerButton: settings.designerButton || "",
+          addtocartForm: settings.addtocartForm || null,
           cssCode: settings.cssCode || "",
         }),
       });
@@ -253,12 +273,25 @@ const Settings = () => {
               <Input
                 label="Custom selector for Customize Designer button"
                 description="Enter the class or ID of the location where you want the button (if using a custom theme)."
-                required
                 value={settings.designerButton}
                 placeholder="e.g., .add-to-cart-buttons, #product-actions"
                 width="medium"
                 maxLength={200}
                 onChange={handleInputChange("designerButton")}
+              />
+            </Box>
+          </Panel>
+
+          <Panel>
+            <Box style={{marginTop:'-15px'}}>
+              <Input
+                label="Product add-to-cart form selector"
+                description="If your theme's add-to-cart function doesn't work, add your product form selector here (e.g., .product-form .form)"
+                value={settings.addtocartForm}
+                placeholder="e.g., .product-form .form"
+                width="medium"
+                maxLength={200}
+                onChange={handleInputChange("addtocartForm")}
               />
             </Box>
           </Panel>

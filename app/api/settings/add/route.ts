@@ -11,6 +11,7 @@ export async function POST(request: NextRequest) {
       enableShare, 
       designerButtonName, 
       designerButton, 
+      addtocartForm,
       cssCode 
     } = body;
 
@@ -35,6 +36,7 @@ export async function POST(request: NextRequest) {
       enableShare: Boolean(enableShare),
       designerButtonName: designerButtonName?.toString() || "Customize",
       designerButton: designerButton?.toString() || "",
+      addtocartForm: addtocartForm?.toString() || "",
       cssCode: cssCode?.toString() || "",
       apiToken: `${langEng?.storeApi?.token}-settings-save`,
     };

@@ -97,20 +97,21 @@ function getCurrentVariant() {
 // ======================================================
 // Global Config Initialization
 // ======================================================
-const shopData = getShopDataFromURL();
+var shopData = getShopDataFromURL();
 if (shopData?.shopId) window.krcustomizer_config = shopData;
 
-const krAppConfig = window?.krcustomizer_config;
+var krAppConfig = window?.krcustomizer_config;
 console.log("krAppConfig", krAppConfig);
 
-const kr_endpoint = "https://app.krcustomizer.com/";
-const kr_endpoint_app = "https://www.scchs.co.in/";
-const kr_store_hash = krAppConfig?.shopId;
-const kr_shop = krAppConfig?.shop;
-const kr_page_type = getPageType();
-const kr_product_id = `gid://shopify/Product/${krAppConfig?.productId}`;
-const kr_root_app_id = "kr-customizer-root";
-const ele_product_form = getProductForm();
+var kr_endpoint = "https://app.krcustomizer.com/";
+var kr_endpoint_app = "https://www.scchs.co.in/";
+var kr_store_hash = krAppConfig?.shopId;
+var kr_shop = krAppConfig?.shop;
+var kr_page_type = getPageType();
+var kr_product_id = `gid://shopify/Product/${krAppConfig?.productId}`;
+var kr_root_app_id = "kr-customizer-root";
+var ele_product_form = getProductForm();
+var ele_product_form_addtocart = null;
 
 if(kr_page_type == "product"){
     console.log("%c KR Customizer Init ", "display:inline-block;font-size:14px;background:linear-gradient(to right,#455eee,#985dd0,#b62286);padding:5px;border-radius:4px;");
@@ -177,13 +178,30 @@ function mountCustomizerApp(productData) {
 // ======================================================
 // Form Validation
 // ======================================================
-function validateForm(form) {
-  if (!form) return false;
+function validateForm(formNew) {
+  
+  if (!formNew) return false;
+
+  //Handle both CSS selector strings and form elements
+  const form = typeof formNew === 'string' ? document?.querySelector(formNew) : formNew;
+  
+  if (!form) {
+    console.error('Form not found');
+    return false;
+  }
 
   const variantInput = form.querySelector('[name="id"]');
 
-  // Ensure variant selection
-  if (variantInput && !variantInput.value) {
+  // Ensure variant selection - FIXED: Handle both cases
+  if (variantInput) {
+    // Variant input exists but has no value
+    if (!variantInput.value) {
+      alert("Please select all required options (size, color, etc.) before proceeding");
+      return false;
+    }
+  } else {
+    // Variant input is null - return false
+    console.error('Variant input not found');
     alert("Please select all required options (size, color, etc.) before proceeding");
     return false;
   }
@@ -256,13 +274,17 @@ async function appAuthentication() {
     const { appSettings } = result;
     const cssCode = appSettings?.cssCode;
     const designerButton = appSettings?.designerButton;
+    const addtocartForm = appSettings?.addtocartForm;
     const designerButtonName = appSettings?.designerButtonName || "Customize";
+
+
+    ele_product_form_addtocart = addtocartForm != "" && typeof addtocartForm != "undefined" && typeof addtocartForm != null ? addtocartForm : getProductForm();
 
     if (cssCode) appendCSS(cssCode);
 
     const buttonHTML = `<button type="button" class="button button--primary kr-customize-handel" data-kr-customize-handel>${designerButtonName}</button>`;
     if (!document.querySelector(".kr-customize-handel")) {
-      const target =  designerButton != "" ? document.querySelector(designerButton) : ele_product_form || ele_product_form;
+      const target =  designerButton != "" && typeof designerButton != "undefined" ? document.querySelector(designerButton) : ele_product_form || ele_product_form;
       target?.insertAdjacentHTML("beforeend", buttonHTML);
     }
   } catch (err) {
@@ -288,7 +310,7 @@ document.addEventListener("click", async (e) => {
   if (!btn) return;
 
   appModelVisibility("hide");
-  if (!validateForm(ele_product_form)) return;
+  if (!validateForm(ele_product_form_addtocart)) return;
 
   btn.disabled = true;
   const originalText = btn.innerText;
@@ -320,8 +342,15 @@ document.addEventListener("click", async (e) => {
     } else {
       mountCustomizerApp(productData);
     }
+
+    btn.disabled = false;
+    btn.innerText = originalText;
+
   } catch (err) {
     console.error(err);
+    btn.disabled = false;
+    btn.innerText = originalText;
+
   } finally {
     setTimeout(() => {
       btn.disabled = false;
@@ -335,7 +364,7 @@ document.addEventListener("click", async (e) => {
   const btn = e.target.closest("button[data-kr-addtocart-handel]");
   if (!btn) return;
   
-  if (!validateForm(ele_product_form)) return;
+  if (!validateForm(ele_product_form_addtocart)) return;
 
   window?.setCustomizerLoading(true);
   const krDesignData = JSON.parse(localStorage.getItem("krDesignData") || "{}");
