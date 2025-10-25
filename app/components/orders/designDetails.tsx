@@ -3,7 +3,7 @@ import { Box, Flex, Text } from "@bigcommerce/big-design";
 const JsonDesignUI = ({ data }: { data: any }) => {
   if (!data) return null;
 
-  const { customizations, screenshots, ProductType } = data;
+  const { customizations, screenshots, ProductType } = JSON.parse(data);
 
   const parts = customizations?.parts || {};
   const variants = customizations?.selectedVariants || [];
@@ -11,7 +11,6 @@ const JsonDesignUI = ({ data }: { data: any }) => {
 
   return (
     <Box style={{marginTop:'20px'}}>
-      {/* Header */}
       
       <Flex flexGap={'10px'}>
         <Text color="primary">Product Type:</Text>
