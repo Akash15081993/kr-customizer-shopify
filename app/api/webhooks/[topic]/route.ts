@@ -1,12 +1,12 @@
 import crypto from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextRequest, { params }: { params: { topic: string } }) {
+export async function POST(req: NextRequest, { params }: { params: { topic: any } }) {
   const rawBody = await req.text();
   const hmacHeader = req.headers.get("x-shopify-hmac-sha256") || "";
 
   const digest = crypto
-    .createHmac("sha256", process.env.SHOPIFY_API_SECRET as string)
+    .createHmac("sha256", process.env.SHOPIFY_API_SECRET as any)
     .update(rawBody, "utf8")
     .digest("base64");
 
