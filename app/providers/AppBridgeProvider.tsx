@@ -15,7 +15,6 @@ export const useAppBridge = () => {
   return context;
 };
 
-
 function AppBridgeInner({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
 

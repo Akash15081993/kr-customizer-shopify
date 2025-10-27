@@ -24,6 +24,7 @@ export default async function Home(props: { searchParams?: Promise<Record<string
   
   const searchParams = await props.searchParams;
   const shopParam = searchParams?.shop;
+  const hostParam = searchParams?.host;
   const shop = typeof shopParam === "string" ? shopParam : undefined;
 
   if (!shop) {
@@ -71,9 +72,9 @@ export default async function Home(props: { searchParams?: Promise<Record<string
 
   if (existingSession) {
     // Shop already installed → go to dashboard
-    return redirect(`/dashboard?shop=${encodeURIComponent(shop)}`);
+    return redirect(`/dashboard?shop=${encodeURIComponent(shop)}&host=${hostParam}`);
   } else {
     // Shop not installed → go to install route
-    return redirect(`/api/auth/install?shop=${encodeURIComponent(shop)}`);
+    return redirect(`/api/auth/install?shop=${encodeURIComponent(shop)}&host=${hostParam}`);
   }
 }
