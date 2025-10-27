@@ -6,23 +6,22 @@ embedded = true
 [webhooks]
 api_version = "2024-10"
 
-# For orders webhook (your business functionality)
 [[webhooks.subscriptions]]
 topic = "orders/create"
 uri = "https://apps.krcustomizer.com/api/webhooks/orders"
 
-# For mandatory GDPR compliance webhooks
+# UPDATE THESE TO MATCH YOUR WORKING APP:
 [[webhooks.subscriptions]]
 topic = "customers/data_request"
-uri = "https://apps.krcustomizer.com/api/webhooks/customers/data_request"
+uri = "https://apps.krcustomizer.com/api/gdpr/customers_data_request"
 
 [[webhooks.subscriptions]]
 topic = "customers/redact" 
-uri = "https://apps.krcustomizer.com/api/webhooks/customers/redact"
+uri = "https://apps.krcustomizer.com/api/gdpr/customers_redact"
 
 [[webhooks.subscriptions]]
 topic = "shop/redact"
-uri = "https://apps.krcustomizer.com/api/webhooks/shop/redact"
+uri = "https://apps.krcustomizer.com/api/gdpr/shop_redact"
 
 [auth]
 redirect_urls = [
