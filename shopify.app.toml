@@ -7,8 +7,16 @@ embedded = true
 api_version = "2025-10"
 
 [[webhooks.subscriptions]]
-compliance_topics = ["customers/data_request", "customers/redact", "shop/redact"]
-uri = "https://apps.krcustomizer.com/api/webhooks"
+topic = "customers/data_request"
+uri = "https://apps.krcustomizer.com/api/webhooks/customers/data_request"
+
+[[webhooks.subscriptions]]
+topic = "customers/redact"
+uri = "https://apps.krcustomizer.com/api/webhooks/customers/redact"
+
+[[webhooks.subscriptions]]
+topic = "shop/redact"
+uri = "https://apps.krcustomizer.com/api/webhooks/shop/redact"
 
 [auth]
 redirect_urls = [
