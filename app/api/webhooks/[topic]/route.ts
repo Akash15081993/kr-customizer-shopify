@@ -1,7 +1,13 @@
+// app/api/webhooks/[topic]/route.ts
 import crypto from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextRequest, { params }: { params: { topic: any } }) {
+export async function POST(
+  req: NextRequest, 
+  { params }: { params: Promise<{ topic: string }> } // ✅ params is a Promise
+) {
+  // ✅ Await the params first
+  const { topic } = await params;
   const rawBody = await req.text();
   const hmacHeader = req.headers.get("x-shopify-hmac-sha256") || "";
 
@@ -16,11 +22,11 @@ export async function POST(req: NextRequest, { params }: { params: { topic: any 
 
   // ✅ Verified webhook
   const data = JSON.parse(rawBody);
-  console.log("Received webhook:", params.topic, data);
+  console.log("Received webhook:", topic, data);
 
   // Example: handle uninstall
-  if (params.topic === "app_uninstalled") {
-    console.log(`App uninstalled from ${data.shop_domain}`);
+  if (topic === "app_uninstalled") {
+    console.log(`App uninstalled from ${data.domain || data.shop_domain}`);
   }
 
   return NextResponse.json({ success: true });
