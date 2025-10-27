@@ -93,11 +93,9 @@ export async function GET(req: Request) {
 
    // STEP 2: Register mandatory webhooks
   const webhooks = [
-    { topic: "APP_UNINSTALLED", address: `${process.env.APP_URL}/api/webhooks/app_uninstalled` },
-    { topic: "SHOP_UPDATE", address: `${process.env.APP_URL}/api/webhooks/shop_update` },
-    { topic: "CUSTOMERS_DATA_REQUEST", address: `${process.env.APP_URL}/api/webhooks/customers_data_request` },
-    { topic: "CUSTOMERS_REDACT", address: `${process.env.APP_URL}/api/webhooks/customers_redact` },
-    { topic: "SHOP_REDACT", address: `${process.env.APP_URL}/api/webhooks/shop_redact` },
+    { topic: "CUSTOMERS_DATA_REQUEST", address: `${process.env.SHOPIFY_APP_URL}/api/webhooks/customers/data_request` },
+    { topic: "CUSTOMERS_REDACT", address: `${process.env.SHOPIFY_APP_URL}/api/webhooks/customers/redact` },
+    { topic: "SHOP_REDACT", address: `${process.env.SHOPIFY_APP_URL}/api/webhooks/shop/redact` },
   ];
   for (const webhook of webhooks) {
     await fetch(`https://${shop}/admin/api/${apiVersion}/webhooks.json`, {
