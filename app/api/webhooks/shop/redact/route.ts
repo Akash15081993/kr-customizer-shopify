@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 
+export async function GET(request: NextRequest) {
+  // Return 200 for health checks
+  return NextResponse.json({ 
+    status: 'active',
+    webhook: 'shop/redact'
+  });
+}
+
 export async function POST(request: NextRequest) {
   try {
     const hmac = request.headers.get('x-shopify-hmac-sha256');
@@ -19,11 +27,8 @@ export async function POST(request: NextRequest) {
 
     const data = JSON.parse(body);
     
-    // Handle shop redaction (app uninstall) - delete all shop data
+    // Handle shop redaction
     console.log('Shop redaction request received:', data);
-    
-    // Delete all shop data you've stored
-    // This is mandatory for GDPR compliance when app is uninstalled
     
     return NextResponse.json({ received: true });
   } catch (error) {

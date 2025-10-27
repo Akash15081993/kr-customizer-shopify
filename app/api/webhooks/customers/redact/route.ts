@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 
+export async function GET(request: NextRequest) {
+  // Return 200 for health checks
+  return NextResponse.json({ 
+    status: 'active',
+    webhook: 'customers/redact'
+  });
+}
+
 export async function POST(request: NextRequest) {
   try {
     const hmac = request.headers.get('x-shopify-hmac-sha256');
@@ -19,11 +27,8 @@ export async function POST(request: NextRequest) {
 
     const data = JSON.parse(body);
     
-    // Handle customer data redaction - delete all customer data
+    // Handle customer data redaction
     console.log('Customer redaction request received:', data);
-    
-    // Delete any customer data you've stored
-    // This is mandatory for GDPR compliance
     
     return NextResponse.json({ received: true });
   } catch (error) {

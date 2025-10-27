@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 
+export async function GET(request: NextRequest) {
+  // Return 200 for health checks
+  return NextResponse.json({ 
+    status: 'active',
+    webhook: 'customers/data_request'
+  });
+}
+
 export async function POST(request: NextRequest) {
   try {
     const hmac = request.headers.get('x-shopify-hmac-sha256');
@@ -20,10 +28,9 @@ export async function POST(request: NextRequest) {
     const data = JSON.parse(body);
     
     // Handle customer data request
-    // You need to provide any customer data you've stored
     console.log('Customer data request received:', data);
     
-    // IMPORTANT: Return 200 immediately, then process asynchronously
+    // IMPORTANT: Return 200 immediately
     return NextResponse.json({ received: true });
   } catch (error) {
     console.error('Error in customers/data_request:', error);

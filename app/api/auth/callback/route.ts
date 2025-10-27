@@ -4,7 +4,7 @@ import langEng from "@/lang/en";
 import prisma from "@/lib/prisma";
 import { AddMetafieldProduct } from "@/lib/product/metafields";
 import { AddScriptTag } from "@/lib/scriptTag";
-import { RegisterGDPRWebhooks, RegisterOrderWebhook } from "@/lib/shopify-webhooks";
+import { RegisterOrderWebhook } from "@/lib/shopify-webhooks";
 import { getCurrentShopifyVersion } from "@/lib/shopifyVersion";
 
 export async function GET(req: Request) {
@@ -86,7 +86,7 @@ export async function GET(req: Request) {
 
   //Register order webhook
   await RegisterOrderWebhook(shop, accessToken);
-  await RegisterGDPRWebhooks(shop, accessToken);
+  //await RegisterGDPRWebhooks(shop, accessToken);
 
   //Add Metafield Product
   await AddMetafieldProduct(shop, accessToken)

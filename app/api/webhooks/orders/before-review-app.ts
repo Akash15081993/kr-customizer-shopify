@@ -7,15 +7,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 const SHOPIFY_SECRET = process.env.SHOPIFY_API_SECRET!;
 
-// ADD THIS GET HANDLER - Health check endpoint
-export async function GET(request: NextRequest) {
-  // Return 200 for health checks
-  return NextResponse.json({ 
-    status: 'active',
-    webhook: 'orders'
-  });
-}
-
 // Timeout helper function
 const fetchWithTimeout = (url: string, options: RequestInit = {}, timeout = 10000) => {
   const controller = new AbortController();
