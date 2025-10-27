@@ -72,9 +72,9 @@ export default async function Home(props: { searchParams?: Promise<Record<string
 
   if (existingSession) {
     // Shop already installed → go to dashboard
-    return redirect(`/dashboard?shop=${encodeURIComponent(shop)}&host=${hostParam}`);
+    return redirect(`/dashboard?shop=${encodeURIComponent(shop)}`);
   } else {
     // Shop not installed → go to install route
-    return redirect(`/api/auth/install?shop=${encodeURIComponent(shop)}&host=${hostParam}`);
+    return redirect(`/api/auth/install?shop=${encodeURIComponent(shop)}`);
   }
 }

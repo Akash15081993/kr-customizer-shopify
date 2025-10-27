@@ -27,6 +27,7 @@ function AppBridgeInner({ children }: { children: React.ReactNode }) {
     console.log('host')
     console.log('host')
     console.log(host)
+    console.log(searchParams)
     if (!host) return null;
 
     return {
