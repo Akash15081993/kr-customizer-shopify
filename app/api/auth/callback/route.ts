@@ -10,6 +10,7 @@ import { getCurrentShopifyVersion } from "@/lib/shopifyVersion";
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const shop = url.searchParams.get("shop");
+  const host = url.searchParams.get("host");
   const code = url.searchParams.get("code");
   const apiVersion = getCurrentShopifyVersion();
 
@@ -91,7 +92,7 @@ export async function GET(req: Request) {
   await AddMetafieldProduct(shop, accessToken)
 
   //Redirect to /dashboard
-  return NextResponse.redirect(`${process.env.SHOPIFY_APP_URL}/dashboard?shop=${shop}`);
+  return NextResponse.redirect(`${process.env.SHOPIFY_APP_URL}/dashboard?shop=${shop}&host=${host}`);
   
   
 }
