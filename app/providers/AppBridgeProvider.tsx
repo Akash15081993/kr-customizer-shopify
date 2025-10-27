@@ -32,8 +32,8 @@ function AppBridgeInner({ children }: { children: React.ReactNode }) {
 
     return {
       apiKey: process.env.NEXT_PUBLIC_SHOPIFY_API_KEY!,
-      host,
-      forceRedirect: false,
+      host:"admin.shopify.com/store/kr-customizer-app",
+      forceRedirect: true,
     };
   }, [searchParams]);
 
