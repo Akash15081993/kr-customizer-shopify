@@ -4,14 +4,25 @@ application_url = "https://apps.krcustomizer.com"
 embedded = true
 
 [webhooks]
-api_version = "2025-10"
+api_version = "2024-10"
+
+# For orders webhook (your business functionality)
+[[webhooks.subscriptions]]
+topic = "orders/create"
+uri = "https://apps.krcustomizer.com/api/webhooks/orders"
+
+# For mandatory GDPR compliance webhooks
+[[webhooks.subscriptions]]
+topic = "customers/data_request"
+uri = "https://apps.krcustomizer.com/api/webhooks/customers/data_request"
 
 [[webhooks.subscriptions]]
-topics = ["orders/create"]
+topic = "customers/redact" 
+uri = "https://apps.krcustomizer.com/api/webhooks/customers/redact"
 
 [[webhooks.subscriptions]]
-compliance_topics = ["customers/data_request", "customers/redact", "shop/redact"]
-uri = "https://apps.krcustomizer.com/api/webhooks"
+topic = "shop/redact"
+uri = "https://apps.krcustomizer.com/api/webhooks/shop/redact"
 
 [auth]
 redirect_urls = [
