@@ -1,3 +1,4 @@
+//lib\shopify.ts
 import { Session } from "@shopify/shopify-api";
 import prisma from "./prisma";
 import langEng from "@/lang/en";
