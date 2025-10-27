@@ -1,24 +1,29 @@
-# shopify.app.toml
-scopes = "read_orders,read_products,write_products,read_script_tags,write_script_tags,write_draft_orders"
+name = "kr-customizer"
+client_id = "cc7ed34fdd23728e1172722cfdd631e5"
 application_url = "https://apps.krcustomizer.com"
 embedded = true
 
-[webhooks]
-api_version = "2025-10"
-
-[[webhooks.subscriptions]]
-topic = "customers/data_request"
-uri = "https://apps.krcustomizer.com/api/webhooks/customers/data_request"
-
-[[webhooks.subscriptions]]
-topic = "customers/redact"
-uri = "https://apps.krcustomizer.com/api/webhooks/customers/redact"
-
-[[webhooks.subscriptions]]
-topic = "shop/redact"
-uri = "https://apps.krcustomizer.com/api/webhooks/shop/redact"
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "read_orders,read_products,write_products,read_script_tags,write_script_tags,write_draft_orders"
 
 [auth]
 redirect_urls = [
   "https://apps.krcustomizer.com/api/auth/callback"
 ]
+
+[webhooks]
+api_version = "2025-10"
+
+# GDPR Mandatory Webhooks
+[[webhooks.subscriptions]]
+topics = ["customers/data_request"]
+uri = "https://apps.krcustomizer.com/api/webhooks/customers/data_request"
+
+[[webhooks.subscriptions]]
+topics = ["customers/redact"]
+uri = "https://apps.krcustomizer.com/api/webhooks/customers/redact"
+
+[[webhooks.subscriptions]]
+topics = ["shop/redact"]
+uri = "https://apps.krcustomizer.com/api/webhooks/shop/redact"
