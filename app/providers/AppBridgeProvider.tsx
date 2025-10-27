@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useMemo } from "react";
+import React, { createContext, useContext, useMemo, Suspense } from "react";
 import createApp, { AppConfig } from "@shopify/app-bridge";
 import { useSearchParams } from "next/navigation";
 
@@ -15,7 +15,7 @@ export const useAppBridge = () => {
   return context;
 };
 
-export default function AppBridgeProvider({ children }: { children: React.ReactNode }) {
+function AppBridgeInner({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
 
   const appBridgeConfig: AppConfig | null = useMemo(() => {
@@ -41,5 +41,13 @@ export default function AppBridgeProvider({ children }: { children: React.ReactN
     <AppBridgeReactContext.Provider value={app}>
       {children}
     </AppBridgeReactContext.Provider>
+  );
+}
+
+export default function AppBridgeProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={<div>Loading app...</div>}>
+      <AppBridgeInner>{children}</AppBridgeInner>
+    </Suspense>
   );
 }
