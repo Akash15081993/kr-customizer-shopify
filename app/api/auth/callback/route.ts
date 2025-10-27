@@ -91,6 +91,25 @@ export async function GET(req: Request) {
   //Add Metafield Product
   await AddMetafieldProduct(shop, accessToken)
 
+   // STEP 2: Register mandatory webhooks
+  const webhooks = [
+    { topic: "APP_UNINSTALLED", address: `${process.env.APP_URL}/api/webhooks/app_uninstalled` },
+    { topic: "SHOP_UPDATE", address: `${process.env.APP_URL}/api/webhooks/shop_update` },
+    { topic: "CUSTOMERS_DATA_REQUEST", address: `${process.env.APP_URL}/api/webhooks/customers_data_request` },
+    { topic: "CUSTOMERS_REDACT", address: `${process.env.APP_URL}/api/webhooks/customers_redact` },
+    { topic: "SHOP_REDACT", address: `${process.env.APP_URL}/api/webhooks/shop_redact` },
+  ];
+  for (const webhook of webhooks) {
+    await fetch(`https://${shop}/admin/api/${apiVersion}/webhooks.json`, {
+      method: "POST",
+      headers: {
+        "X-Shopify-Access-Token": accessToken,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ webhook }),
+    });
+  }
+
   //Redirect to /dashboard
   return NextResponse.redirect(`${process.env.SHOPIFY_APP_URL}/dashboard?shop=${shop}`);
   
