@@ -21,18 +21,11 @@ function AppBridgeInner({ children }: { children: React.ReactNode }) {
   const appBridgeConfig: AppConfig | null = useMemo(() => {
     if (typeof window === "undefined") return null;
     const host = searchParams.get("host");
-    console.log('host')
-    console.log('host')
-    console.log('host')
-    console.log('host')
-    console.log('host')
-    console.log(host)
-    console.log(searchParams)
     if (!host) return null;
 
     return {
       apiKey: process.env.NEXT_PUBLIC_SHOPIFY_API_KEY!,
-      host:"admin.shopify.com/store/kr-customizer-app",
+      host,
       forceRedirect: true,
     };
   }, [searchParams]);
