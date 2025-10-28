@@ -48,11 +48,13 @@ export async function GET(req: Request) {
     },
   });
 
-
   //Fetch store info from Shopify API
-  const shopRes = await fetch(`https://${shop}/admin/api/${apiVersion}/shop.json`, {
-    headers: { "X-Shopify-Access-Token": accessToken },
-  });
+  const shopRes = await fetch(
+    `https://${shop}/admin/api/${apiVersion}/shop.json`,
+    {
+      headers: { "X-Shopify-Access-Token": accessToken },
+    }
+  );
   const shopData = await shopRes.json();
   const shopInfo = shopData.shop;
 
@@ -89,13 +91,29 @@ export async function GET(req: Request) {
   await RegisterOrderWebhook(shop, accessToken);
 
   //Add Metafield Product
-  await AddMetafieldProduct(shop, accessToken)
-
-  // Prefer host if available, but fallback to encoding the shop domain as base64
-  const finalHost = host || Buffer.from(`admin.shopify.com/store/${shop.replace(".myshopify.com", "")}`).toString("base64");
+  await AddMetafieldProduct(shop, accessToken);
 
   //Redirect to /dashboard
-  //return NextResponse.redirect(`${process.env.SHOPIFY_APP_URL}/dashboard?shop=${shop}&host=${host}`);
-  return NextResponse.redirect(`${process.env.SHOPIFY_APP_URL}/dashboard?shop=${shop}&host=${finalHost}`);
+  //return NextResponse.redirect(`${process.env.SHOPIFY_APP_URL}/dashboard?shop=${shop}&host=${finalHost}`);
+
+  
+  //Prefer host param, fallback to encoded shop path
+  const finalHost = host || Buffer.from(`admin.shopify.com/store/${shop.replace(".myshopify.com", "")}`).toString("base64");
+  const redirectUrl = `${process.env.SHOPIFY_APP_URL}/dashboard?shop=${shop}&host=${finalHost}`;
+
+  //Return HTML that forces the re-embed in Shopify Admin
+  const html = `
+    <script type="text/javascript">
+      if (window.top === window.self) {
+        window.location.href = "${redirectUrl}";
+      } else {
+        window.top.location.href = "${redirectUrl}";
+      }
+    </script>
+  `;
+
+  return new Response(html, {
+    headers: { "Content-Type": "text/html" },
+  });
   
 }
