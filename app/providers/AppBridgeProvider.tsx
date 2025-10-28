@@ -1,10 +1,7 @@
-//app\providers\AppBridgeProvider.tsx
 "use client";
-import React, { createContext, useContext, useMemo, Suspense } from "react";
-import createApp, { AppConfig } from "@shopify/app-bridge";
+import React, { createContext, useContext, useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
-// Create our own context
 const AppBridgeReactContext = createContext<any>(null);
 
 export const useAppBridge = () => {
@@ -17,23 +14,37 @@ export const useAppBridge = () => {
 
 function AppBridgeInner({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
+  const [app, setApp] = useState<any>(null);
 
-  const appBridgeConfig: AppConfig | null = useMemo(() => {
-    if (typeof window === "undefined") return null;
+  useEffect(() => {
     const host = searchParams.get("host");
-    if (!host) return null;
+    if (!host) return;
 
-    return {
-      apiKey: process.env.NEXT_PUBLIC_SHOPIFY_API_KEY!,
-      host,
-      forceRedirect: true,
-    };
+    // Check if App Bridge script already exists
+    if (!document.querySelector('script[src*="shopifycloud/app-bridge.js"]')) {
+      const script = document.createElement("script");
+      script.src = "https://cdn.shopify.com/shopifycloud/app-bridge.js";
+      script.async = true;
+      script.onload = () => {
+        initAppBridge(host);
+      };
+      document.head.appendChild(script);
+    } else {
+      initAppBridge(host);
+    }
+
+    function initAppBridge(host: string) {
+      const appBridgeGlobal = (window as any).appBridge;
+      if (appBridgeGlobal?.createApp) {
+        const appInstance = appBridgeGlobal.createApp({
+          apiKey: process.env.NEXT_PUBLIC_SHOPIFY_API_KEY!,
+          host,
+          forceRedirect: true,
+        });
+        setApp(appInstance);
+      }
+    }
   }, [searchParams]);
-
-  const app = useMemo(() => {
-    if (!appBridgeConfig) return null;
-    return createApp(appBridgeConfig);
-  }, [appBridgeConfig]);
 
   if (!app) return <>{children}</>;
 
@@ -46,7 +57,7 @@ function AppBridgeInner({ children }: { children: React.ReactNode }) {
 
 export default function AppBridgeProvider({ children }: { children: React.ReactNode }) {
   return (
-    <Suspense fallback={<div>Loading app...</div>}>
+    <Suspense fallback={<div>Loading Shopify app...</div>}>
       <AppBridgeInner>{children}</AppBridgeInner>
     </Suspense>
   );
