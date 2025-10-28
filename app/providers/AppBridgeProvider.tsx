@@ -43,7 +43,22 @@ function AppBridgeInner({ children }: { children: React.ReactNode }) {
     }
   }, [searchParams]);
 
-  if (!app) return <div>Loading Shopify AppBridge...</div>;
+  if (!app) {
+    return (
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "100vh",
+        background: "#f6f6f7",
+        color: "#000000",
+        fontSize: "26px",
+        fontFamily: "system-ui, sans-serif"
+      }}>
+        Initializing KR Customizer...
+      </div>
+    );
+  }
 
   return (
     <AppBridgeReactContext.Provider value={app}>
