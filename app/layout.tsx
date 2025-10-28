@@ -7,7 +7,6 @@ import "@shopify/polaris/build/esm/styles.css";
 import { AppProvider } from "@shopify/polaris";
 import enTranslations from "@shopify/polaris/locales/en.json";
 import AppBridgeProvider from "./providers/AppBridgeProvider";
-import Script from "next/script";
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
@@ -33,15 +32,26 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
-        {/* ✅ Shopify App Bridge script (MUST NOT use async/defer/type=module) */}
-        <Script
+        {/* ✅ Load Shopify App Bridge synchronously */}
+        <script
           id="shopify-app-bridge"
           src="https://unpkg.com/@shopify/app-bridge@3"
-          strategy="beforeInteractive"
-          onLoad={() => {
-            console.log("✅ Shopify App Bridge script loaded");
-          }}
           data-api-key={apiKey}
+        ></script>
+
+        {/* Optional: confirm when it’s ready */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              document.addEventListener('DOMContentLoaded', function() {
+                if (window.__SHOPIFY_APP_BRIDGE__) {
+                  console.log("✅ Shopify App Bridge loaded successfully");
+                } else {
+                  console.warn("⚠️ App Bridge still missing");
+                }
+              });
+            `,
+          }}
         />
       </head>
       <body>
