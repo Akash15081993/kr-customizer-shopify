@@ -95,7 +95,6 @@ export async function GET(req: Request) {
 
   //Redirect to /dashboard
   //return NextResponse.redirect(`${process.env.SHOPIFY_APP_URL}/dashboard?shop=${shop}&host=${finalHost}`);
-
   
   // Prefer host if available, but fallback to encoding the shop domain as base64
   const finalHost =
@@ -106,19 +105,22 @@ export async function GET(req: Request) {
 
   const redirectUrl = `${process.env.SHOPIFY_APP_URL}/dashboard?shop=${shop}&host=${finalHost}`;
 
-  // 🔥 Correct re-embed logic
+  //Safe re-embed HTML (recommended)
   const html = `
     <script type="text/javascript">
-      // If this is the top window (not inside Shopify iframe)
+      const shop = "${shop}";
+      const appKey = "${process.env.NEXT_PUBLIC_SHOPIFY_API_KEY}";
+      const finalHost = "${finalHost}";
+      const redirectUrl = "${redirectUrl}";
+
+      // If outside Shopify Admin, redirect into Admin embedded view
       if (window.top === window.self) {
-        // Redirect to Shopify Admin to open app inside iframe
-        window.top.location.href = "https://admin.shopify.com/store/${shop.replace(
-          ".myshopify.com",
-          ""
-        )}/apps/${process.env.NEXT_PUBLIC_SHOPIFY_API_KEY}?shop=${shop}&host=${finalHost}";
+        window.top.location.href = "https://admin.shopify.com/store/" + 
+          shop.replace(".myshopify.com", "") +
+          "/apps/" + appKey + "?shop=" + shop + "&host=" + finalHost;
       } else {
-        // If already embedded, redirect inside the iframe
-        window.location.href = "${redirectUrl}";
+        // If already embedded, reload the top frame directly
+        window.top.location.href = redirectUrl;
       }
     </script>
   `;
@@ -126,6 +128,5 @@ export async function GET(req: Request) {
   return new Response(html, {
     headers: { "Content-Type": "text/html" },
   });
-
   
 }
