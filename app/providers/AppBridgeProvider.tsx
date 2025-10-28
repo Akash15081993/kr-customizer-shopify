@@ -27,7 +27,16 @@ function AppBridgeInner({ children }: { children: React.ReactNode }) {
         forceRedirect: true,
       });
 
-      console.log("✅ Shopify AppBridge initialized:", appInstance);
+      // ✅ Attach globally for debugging
+      if (typeof window !== "undefined") {
+        (window as any).__APP_BRIDGE__ = appInstance;
+        console.info("✅ Shopify AppBridge initialized:", appInstance);
+      }
+
+      appInstance.subscribe("*", (event) => {
+        console.log("🟢 AppBridge event:", event);
+      });
+
       setApp(appInstance);
     } catch (err) {
       console.error("❌ Failed to initialize Shopify AppBridge:", err);
