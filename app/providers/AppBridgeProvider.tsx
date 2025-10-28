@@ -1,12 +1,20 @@
 "use client";
-import React, { createContext, useContext, useEffect, useState, Suspense } from "react";
+
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  Suspense,
+} from "react";
 import { useSearchParams } from "next/navigation";
 
 const AppBridgeReactContext = createContext<any>(null);
 
 export const useAppBridge = () => {
   const context = useContext(AppBridgeReactContext);
-  if (!context) throw new Error("useAppBridge must be used within <AppBridgeProvider>");
+  if (!context)
+    throw new Error("useAppBridge must be used within <AppBridgeProvider>");
   return context;
 };
 
@@ -16,47 +24,41 @@ function AppBridgeInner({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const host = searchParams.get("host");
-    if (!host) return;
+    if (!host || typeof window === "undefined") return;
 
-    // ✅ Dynamically load Shopify App Bridge if not already available
-    const loadAppBridge = async () => {
-      if (typeof window === "undefined") return;
+    // 🕒 Wait until App Bridge script is actually available on window
+    const initAppBridge = () => {
+      const globalAppBridge = (window as any).appBridge;
 
-      if (!(window as any).__SHOPIFY_APP_BRIDGE__) {
-        await new Promise<void>((resolve, reject) => {
-          const script = document.createElement("script");
-          script.src = "https://unpkg.com/@shopify/app-bridge@3";
-          script.async = true;
-          script.dataset.apiKey = process.env.NEXT_PUBLIC_SHOPIFY_API_KEY!;
-          script.onload = () => {
-            console.log("✅ Shopify App Bridge loaded");
-            resolve();
-          };
-          script.onerror = reject;
-          document.head.appendChild(script);
+      if (globalAppBridge?.createApp) {
+        console.log("✅ Shopify App Bridge initializing...");
+
+        const appInstance = globalAppBridge.createApp({
+          apiKey: process.env.NEXT_PUBLIC_SHOPIFY_API_KEY!,
+          host,
+          forceRedirect: true,
         });
+
+        setApp(appInstance);
+        console.log("✅ Shopify App Bridge initialized successfully");
+        return true;
       }
 
-      const appBridgeGlobal = (window as any).appBridge || (window as any).__SHOPIFY_APP_BRIDGE__;
-      if (!appBridgeGlobal?.createApp) {
-        console.error("❌ Shopify App Bridge failed to initialize");
-        return;
-      }
-
-      const appInstance = appBridgeGlobal.createApp({
-        apiKey: process.env.NEXT_PUBLIC_SHOPIFY_API_KEY!,
-        host,
-        forceRedirect: true,
-      });
-
-      console.log("✅ Shopify App created:", appInstance);
-      setApp(appInstance);
+      return false;
     };
 
-    loadAppBridge();
+    // ⏳ Try to initialize immediately, or retry every 300ms until available
+    if (!initAppBridge()) {
+      const interval = setInterval(() => {
+        if (initAppBridge()) clearInterval(interval);
+      }, 300);
+      return () => clearInterval(interval);
+    }
   }, [searchParams]);
 
-  if (!app) return <>{children}</>;
+  if (!app) {
+    return <div>Loading Shopify App Bridge...</div>;
+  }
 
   return (
     <AppBridgeReactContext.Provider value={app}>
@@ -65,9 +67,13 @@ function AppBridgeInner({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function AppBridgeProvider({ children }: { children: React.ReactNode }) {
+export default function AppBridgeProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <Suspense fallback={<div>Loading Shopify app...</div>}>
+    <Suspense fallback={<div>Loading Shopify App...</div>}>
       <AppBridgeInner>{children}</AppBridgeInner>
     </Suspense>
   );
