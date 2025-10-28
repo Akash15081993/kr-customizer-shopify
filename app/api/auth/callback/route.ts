@@ -97,17 +97,28 @@ export async function GET(req: Request) {
   //return NextResponse.redirect(`${process.env.SHOPIFY_APP_URL}/dashboard?shop=${shop}&host=${finalHost}`);
 
   
-  //Prefer host param, fallback to encoded shop path
-  const finalHost = host || Buffer.from(`admin.shopify.com/store/${shop.replace(".myshopify.com", "")}`).toString("base64");
+  // Prefer host if available, but fallback to encoding the shop domain as base64
+  const finalHost =
+    host ||
+    Buffer.from(
+      `admin.shopify.com/store/${shop.replace(".myshopify.com", "")}`
+    ).toString("base64");
+
   const redirectUrl = `${process.env.SHOPIFY_APP_URL}/dashboard?shop=${shop}&host=${finalHost}`;
 
-  //Return HTML that forces the re-embed in Shopify Admin
+  // 🔥 Correct re-embed logic
   const html = `
     <script type="text/javascript">
+      // If this is the top window (not inside Shopify iframe)
       if (window.top === window.self) {
-        window.location.href = "${redirectUrl}";
+        // Redirect to Shopify Admin to open app inside iframe
+        window.top.location.href = "https://admin.shopify.com/store/${shop.replace(
+          ".myshopify.com",
+          ""
+        )}/apps/${process.env.NEXT_PUBLIC_SHOPIFY_API_KEY}?shop=${shop}&host=${finalHost}";
       } else {
-        window.top.location.href = "${redirectUrl}";
+        // If already embedded, redirect inside the iframe
+        window.location.href = "${redirectUrl}";
       }
     </script>
   `;
@@ -115,5 +126,6 @@ export async function GET(req: Request) {
   return new Response(html, {
     headers: { "Content-Type": "text/html" },
   });
+
   
 }
