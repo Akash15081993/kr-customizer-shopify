@@ -1,7 +1,6 @@
 "use client";
 import React, { createContext, useContext, useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import createApp from "@shopify/app-bridge"; 
 
 const AppBridgeReactContext = createContext<any>(null);
 
@@ -17,26 +16,47 @@ function AppBridgeInner({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const host = searchParams.get("host");
-    const apiKey = process.env.NEXT_PUBLIC_SHOPIFY_API_KEY;
+    if (!host) return;
 
-    if (!host || !apiKey) {
-      console.warn("Missing Shopify host or API key");
-      return;
-    }
+    // ✅ Dynamically load Shopify App Bridge if not already available
+    const loadAppBridge = async () => {
+      if (typeof window === "undefined") return;
 
-    const appInstance = createApp({
-      apiKey,
-      host,
-      forceRedirect: true,
-    });
+      if (!(window as any).__SHOPIFY_APP_BRIDGE__) {
+        await new Promise<void>((resolve, reject) => {
+          const script = document.createElement("script");
+          script.src = "https://unpkg.com/@shopify/app-bridge@3";
+          script.async = true;
+          script.dataset.apiKey = process.env.NEXT_PUBLIC_SHOPIFY_API_KEY!;
+          script.onload = () => {
+            console.log("✅ Shopify App Bridge loaded");
+            resolve();
+          };
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+      }
 
-    // 👇 store globally if you want access in console
-    (window as any).appBridge = appInstance;
+      const appBridgeGlobal = (window as any).appBridge || (window as any).__SHOPIFY_APP_BRIDGE__;
+      if (!appBridgeGlobal?.createApp) {
+        console.error("❌ Shopify App Bridge failed to initialize");
+        return;
+      }
 
-    setApp(appInstance);
+      const appInstance = appBridgeGlobal.createApp({
+        apiKey: process.env.NEXT_PUBLIC_SHOPIFY_API_KEY!,
+        host,
+        forceRedirect: true,
+      });
+
+      console.log("✅ Shopify App created:", appInstance);
+      setApp(appInstance);
+    };
+
+    loadAppBridge();
   }, [searchParams]);
 
-  if (!app) return <>{children}</>; // avoid breaking SSR
+  if (!app) return <>{children}</>;
 
   return (
     <AppBridgeReactContext.Provider value={app}>
