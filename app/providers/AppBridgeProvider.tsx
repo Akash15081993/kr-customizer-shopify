@@ -1,6 +1,8 @@
 "use client";
+
 import React, { createContext, useContext, useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import createApp from "@shopify/app-bridge"; // ✅ Import directly
 
 const AppBridgeReactContext = createContext<any>(null);
 
@@ -18,45 +20,21 @@ function AppBridgeInner({ children }: { children: React.ReactNode }) {
     const host = searchParams.get("host");
     if (!host) return;
 
-    // ✅ Dynamically load Shopify App Bridge if not already available
-    const loadAppBridge = async () => {
-      if (typeof window === "undefined") return;
-
-      if (!(window as any).__SHOPIFY_APP_BRIDGE__) {
-        await new Promise<void>((resolve, reject) => {
-          const script = document.createElement("script");
-          script.src = "https://unpkg.com/@shopify/app-bridge@3";
-          script.async = true;
-          script.dataset.apiKey = process.env.NEXT_PUBLIC_SHOPIFY_API_KEY!;
-          script.onload = () => {
-            console.log("✅ Shopify App Bridge loaded");
-            resolve();
-          };
-          script.onerror = reject;
-          document.head.appendChild(script);
-        });
-      }
-
-      const appBridgeGlobal = (window as any).appBridge || (window as any).__SHOPIFY_APP_BRIDGE__;
-      if (!appBridgeGlobal?.createApp) {
-        console.error("❌ Shopify App Bridge failed to initialize");
-        return;
-      }
-
-      const appInstance = appBridgeGlobal.createApp({
+    try {
+      const appInstance = createApp({
         apiKey: process.env.NEXT_PUBLIC_SHOPIFY_API_KEY!,
         host,
         forceRedirect: true,
       });
 
-      console.log("✅ Shopify App created:", appInstance);
+      console.log("✅ Shopify AppBridge initialized:", appInstance);
       setApp(appInstance);
-    };
-
-    loadAppBridge();
+    } catch (err) {
+      console.error("❌ Failed to initialize Shopify AppBridge:", err);
+    }
   }, [searchParams]);
 
-  if (!app) return <>{children}</>;
+  if (!app) return <div>Loading Shopify AppBridge...</div>;
 
   return (
     <AppBridgeReactContext.Provider value={app}>
@@ -67,7 +45,7 @@ function AppBridgeInner({ children }: { children: React.ReactNode }) {
 
 export default function AppBridgeProvider({ children }: { children: React.ReactNode }) {
   return (
-    <Suspense fallback={<div>Loading Shopify app...</div>}>
+    <Suspense fallback={<div>Loading Shopify App...</div>}>
       <AppBridgeInner>{children}</AppBridgeInner>
     </Suspense>
   );
