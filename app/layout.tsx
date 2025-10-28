@@ -33,7 +33,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <NextProgressBar />
         <AppProvider i18n={enTranslations}>
           <Suspense fallback={<div>Loading app...</div>}>
-            <InnerProviders>{children}</InnerProviders>
+            <InnerProviders>
+              <div className="container">{children}</div>
+            </InnerProviders>
           </Suspense>
         </AppProvider>
       </body>

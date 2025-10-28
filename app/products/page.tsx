@@ -16,11 +16,13 @@ import Header from "../components/header";
 import Link from "next/link";
 import { useShop } from "../contexts/ShopContext";
 import Loading from "../components/loading";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const Products = () => {
   const { shop } = useShop();
-   const router = useRouter();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const host = searchParams.get("host");
 
   const encodedContext = "";
   const [pageLoading, setpageLoading] = useState(true);
@@ -166,7 +168,7 @@ const Products = () => {
           </Flex>
 
           <FlexItem>
-            <Link href="/product-add">
+            <Link href={`/product-add?shop=${shop}&host=${host}`}>
               <Button actionType="normal" isLoading={false} variant="primary">
                 <AddIcon /> Add product for design
               </Button>
