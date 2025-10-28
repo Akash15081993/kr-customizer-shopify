@@ -14,7 +14,7 @@ export default async function Dashboard(props: {
   const searchParams = await props.searchParams;
   const shopParam = searchParams?.shop;
   const shop = typeof shopParam === "string" ? shopParam : undefined;
-
+  
   if (!shop) {
     return <ClientCheckShop />;
   }
