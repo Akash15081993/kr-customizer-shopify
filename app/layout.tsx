@@ -1,4 +1,3 @@
-// app/layout.tsx
 "use client";
 
 import "./globals.css";
@@ -8,6 +7,24 @@ import "@shopify/polaris/build/esm/styles.css";
 import { AppProvider } from "@shopify/polaris";
 import enTranslations from "@shopify/polaris/locales/en.json";
 import AppBridgeProvider from "./providers/AppBridgeProvider";
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+
+function InnerProviders({ children }: { children: React.ReactNode }) {
+  const searchParams = useSearchParams();
+  const host = searchParams.get("host");
+  const shop = searchParams.get("shop");
+
+  if (!host || !shop) {
+    return <div>Loading Shopify context...</div>;
+  }
+
+  return (
+    <AppBridgeProvider>
+      <ShopProvider>{children}</ShopProvider>
+    </AppBridgeProvider>
+  );
+}
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -15,9 +32,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <NextProgressBar />
         <AppProvider i18n={enTranslations}>
-          <AppBridgeProvider>
-            <ShopProvider>{children}</ShopProvider>
-          </AppBridgeProvider>
+          <Suspense fallback={<div>Loading app...</div>}>
+            <InnerProviders>{children}</InnerProviders>
+          </Suspense>
         </AppProvider>
       </body>
     </html>
