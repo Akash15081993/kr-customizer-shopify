@@ -1,5 +1,5 @@
+//app\providers\AppBridgeProvider.tsx
 "use client";
-
 import React, { createContext, useContext, useMemo, Suspense } from "react";
 import createApp, { AppConfig } from "@shopify/app-bridge";
 import { useSearchParams } from "next/navigation";
@@ -22,6 +22,10 @@ function AppBridgeInner({ children }: { children: React.ReactNode }) {
     if (typeof window === "undefined") return null;
     const host = searchParams.get("host");
     if (!host) return null;
+
+    console.log('process.env.NEXT_PUBLIC_SHOPIFY_API_KEY')
+    console.log(process.env.NEXT_PUBLIC_SHOPIFY_API_KEY)
+    console.log(host)
 
     return {
       apiKey: process.env.NEXT_PUBLIC_SHOPIFY_API_KEY!,

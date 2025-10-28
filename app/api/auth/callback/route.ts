@@ -91,8 +91,11 @@ export async function GET(req: Request) {
   //Add Metafield Product
   await AddMetafieldProduct(shop, accessToken)
 
+  // Prefer host if available, but fallback to encoding the shop domain as base64
+  const finalHost = host || Buffer.from(`admin.shopify.com/store/${shop.replace(".myshopify.com", "")}`).toString("base64");
+
   //Redirect to /dashboard
-  return NextResponse.redirect(`${process.env.SHOPIFY_APP_URL}/dashboard?shop=${shop}&host=${host}`);
-  
+  //return NextResponse.redirect(`${process.env.SHOPIFY_APP_URL}/dashboard?shop=${shop}&host=${host}`);
+  return NextResponse.redirect(`${process.env.SHOPIFY_APP_URL}/dashboard?shop=${shop}&host=${finalHost}`);
   
 }

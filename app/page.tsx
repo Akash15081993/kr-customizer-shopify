@@ -1,18 +1,4 @@
-// // app/page.tsx
-// import { redirect } from 'next/navigation';
-
-// export default function Home({ searchParams }: { searchParams?: Record<string, string> }) {
-//   const shopParam = searchParams?.shop;
-//   const shop = typeof shopParam === 'string' ? shopParam : undefined;
-//   if (shop) {
-//     // Server-side redirect to install route
-//     return redirect(`/api/auth/install?shop=${encodeURIComponent(shop)}`);
-//   }
-//   return <div>Loading</div>;
-// }
-
-
-
+// app/page.tsx
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import Header from "./components/header";
@@ -72,9 +58,9 @@ export default async function Home(props: { searchParams?: Promise<Record<string
 
   if (existingSession) {
     // Shop already installed → go to dashboard
-    return redirect(`/dashboard?shop=${encodeURIComponent(shop)}`);
+    return redirect(`/dashboard?shop=${encodeURIComponent(shop)}&host=${hostParam}`);
   } else {
     // Shop not installed → go to install route
-    return redirect(`/api/auth/install?shop=${encodeURIComponent(shop)}`);
+    return redirect(`/api/auth/install?shop=${encodeURIComponent(shop)}&host=${hostParam}`);
   }
 }
