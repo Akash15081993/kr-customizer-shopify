@@ -14,16 +14,23 @@ export const useAppBridge = () => {
 function AppBridgeInner({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
   const [app, setApp] = useState<any>(null);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isClient) return;
+
     const host = searchParams.get("host");
     if (!host) return;
 
     const appInstance = initAppBridge(host);
-    setApp(appInstance);
-  }, [searchParams]);
+    if (appInstance) setApp(appInstance);
+  }, [searchParams, isClient]);
 
-  if (!app) return <>{children}</>;
+  if (!app) return <div>Loading Shopify AppBridge...</div>;
 
   return (
     <AppBridgeReactContext.Provider value={app}>
