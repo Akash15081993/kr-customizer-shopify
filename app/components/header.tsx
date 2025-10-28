@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState, useMemo } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useShop } from "../contexts/ShopContext";
 
 interface HeaderProps {
@@ -11,12 +11,14 @@ interface HeaderProps {
 
 export default function Header({ isActiveMenu, backRoute }: HeaderProps) {
   const { shop, isLoading } = useShop();
+  const searchParams = useSearchParams();
+  const host = searchParams.get("host");
+
   const pathname = usePathname();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Memoize navLinks to prevent unnecessary recalculations
-  const navLinks = useMemo(() => {
+   const navLinks = useMemo(() => {
     const baseLinks = [
       { href: "/dashboard", label: "Dashboard", key: "dashboard" },
       { href: "/products", label: "Products", key: "products" },
@@ -24,16 +26,21 @@ export default function Header({ isActiveMenu, backRoute }: HeaderProps) {
       { href: "/settings", label: "Settings", key: "settings" },
     ];
 
-    // Only add shop parameter if available
-    if (shop) {
-      return baseLinks.map(link => ({
+    //Include both shop & host if available
+    if (shop && host) {
+      return baseLinks.map((link) => ({
         ...link,
-        href: `${link.href}?shop=${shop}`
+        href: `${link.href}?shop=${shop}&host=${host}`,
+      }));
+    } else if (shop) {
+      return baseLinks.map((link) => ({
+        ...link,
+        href: `${link.href}?shop=${shop}`,
       }));
     }
 
     return baseLinks;
-  }, [shop]);
+  }, [shop, host]);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -42,13 +49,14 @@ export default function Header({ isActiveMenu, backRoute }: HeaderProps) {
   // Handle back button click
   const handleBackClick = () => {
     if (backRoute) {
-      if (shop) {
+      if (shop && host) {
+        router.push(`${backRoute}?shop=${shop}&host=${host}`);
+      } else if (shop) {
         router.push(`${backRoute}?shop=${shop}`);
       } else {
         router.push(backRoute);
       }
     } else {
-      // Fallback: go back in history
       router.back();
     }
   };
@@ -135,7 +143,7 @@ export default function Header({ isActiveMenu, backRoute }: HeaderProps) {
               ) : (
                 // Logo
                 <Link 
-                  href={shop ? `/dashboard?shop=${shop}` : '/dashboard'}
+                  href={shop ? `/dashboard?shop=${shop}&host=${host}` : '/dashboard'}
                   className="flex items-center"
                 >
                   <img
