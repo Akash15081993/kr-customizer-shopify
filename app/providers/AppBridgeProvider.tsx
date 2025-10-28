@@ -1,6 +1,7 @@
 "use client";
 import React, { createContext, useContext, useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import createApp from "@shopify/app-bridge";
 
 const AppBridgeReactContext = createContext<any>(null);
 
@@ -16,24 +17,26 @@ function AppBridgeInner({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const host = searchParams.get("host");
-    if (!host || typeof window === "undefined") return;
+    const apiKey = process.env.NEXT_PUBLIC_SHOPIFY_API_KEY;
 
-    const appBridgeGlobal = (window as any).appBridge;
-    if (!appBridgeGlobal?.createApp) {
-      console.warn("App Bridge not found on window");
+    if (!host || !apiKey) {
+      console.warn("Missing Shopify host or API key");
       return;
     }
 
-    const appInstance = appBridgeGlobal.createApp({
-      apiKey: process.env.NEXT_PUBLIC_SHOPIFY_API_KEY!,
+    const appInstance = createApp({
+      apiKey,
       host,
       forceRedirect: true,
     });
 
+    // 👇 store globally if you want access in console
+    (window as any).appBridge = appInstance;
+
     setApp(appInstance);
   }, [searchParams]);
 
-  if (!app) return <>{children}</>;
+  if (!app) return <>{children}</>; // avoid breaking SSR
 
   return (
     <AppBridgeReactContext.Provider value={app}>

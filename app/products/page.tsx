@@ -17,14 +17,12 @@ import Link from "next/link";
 import { useShop } from "../contexts/ShopContext";
 import Loading from "../components/loading";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getAppBridgeToken, initAppBridge } from "@/lib/shopifyAppBridge";
 
 const Products = () => {
   const { shop } = useShop();
   const router = useRouter();
   const searchParams = useSearchParams();
   const host = searchParams.get("host");
- const [token, setToken] = useState("");
 
   const encodedContext = "";
   const [pageLoading, setpageLoading] = useState(true);
@@ -128,21 +126,6 @@ const Products = () => {
     setCurrentPage(1);
     await getProduct(1, itemsPerPage, searchProductId.trim());
   };
-
-  useEffect(() => {
-    const app = initAppBridge();
-    if (!app) {
-      console.error("App Bridge failed to initialize");
-      return;
-    }
-
-    getAppBridgeToken().then((token:any) => {
-      console.log("App Bridge Token:", token);
-      setToken(token);
-    });
-  }, []);
-
-   if (!token) return <div>Loading Shopify context.....</div>;
 
   return (
     <>

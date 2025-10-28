@@ -9,6 +9,7 @@ import enTranslations from "@shopify/polaris/locales/en.json";
 import AppBridgeProvider from "./providers/AppBridgeProvider";
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import Script from "next/script";
 
 function InnerProviders({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
@@ -30,7 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
-        <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
+         <Script src="https://cdn.shopify.com/shopifycloud/app-bridge.js" strategy="beforeInteractive" />
       </head>
       <body>
         <NextProgressBar />
