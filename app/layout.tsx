@@ -30,9 +30,6 @@ function InnerProviders({ children }: { children: React.ReactNode }) {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <head>
-         <Script src="https://cdn.shopify.com/shopifycloud/app-bridge.js" strategy="beforeInteractive" />
-      </head>
       <body>
         <NextProgressBar />
         <AppProvider i18n={enTranslations}>
