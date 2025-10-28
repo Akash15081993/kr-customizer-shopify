@@ -1,7 +1,6 @@
 "use client";
 import React, { createContext, useContext, useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { initAppBridge } from "@/lib/shopifyAppBridge";
 
 const AppBridgeReactContext = createContext<any>(null);
 
@@ -14,23 +13,50 @@ export const useAppBridge = () => {
 function AppBridgeInner({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
   const [app, setApp] = useState<any>(null);
-  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isClient) return;
-
     const host = searchParams.get("host");
     if (!host) return;
 
-    const appInstance = initAppBridge(host);
-    if (appInstance) setApp(appInstance);
-  }, [searchParams, isClient]);
+    // ✅ Dynamically load Shopify App Bridge if not already available
+    const loadAppBridge = async () => {
+      if (typeof window === "undefined") return;
 
-  if (!app) return <div>Loading Shopify AppBridge...</div>;
+      if (!(window as any).__SHOPIFY_APP_BRIDGE__) {
+        await new Promise<void>((resolve, reject) => {
+          const script = document.createElement("script");
+          script.src = "https://unpkg.com/@shopify/app-bridge@3";
+          script.async = true;
+          script.dataset.apiKey = process.env.NEXT_PUBLIC_SHOPIFY_API_KEY!;
+          script.onload = () => {
+            console.log("✅ Shopify App Bridge loaded");
+            resolve();
+          };
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+      }
+
+      const appBridgeGlobal = (window as any).appBridge || (window as any).__SHOPIFY_APP_BRIDGE__;
+      if (!appBridgeGlobal?.createApp) {
+        console.error("❌ Shopify App Bridge failed to initialize");
+        return;
+      }
+
+      const appInstance = appBridgeGlobal.createApp({
+        apiKey: process.env.NEXT_PUBLIC_SHOPIFY_API_KEY!,
+        host,
+        forceRedirect: true,
+      });
+
+      console.log("✅ Shopify App created:", appInstance);
+      setApp(appInstance);
+    };
+
+    loadAppBridge();
+  }, [searchParams]);
+
+  if (!app) return <>{children}</>;
 
   return (
     <AppBridgeReactContext.Provider value={app}>
