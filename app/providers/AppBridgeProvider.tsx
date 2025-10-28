@@ -23,10 +23,6 @@ function AppBridgeInner({ children }: { children: React.ReactNode }) {
     const host = searchParams.get("host");
     if (!host) return null;
 
-    console.log('process.env.NEXT_PUBLIC_SHOPIFY_API_KEY')
-    console.log(process.env.NEXT_PUBLIC_SHOPIFY_API_KEY)
-    console.log(host)
-
     return {
       apiKey: process.env.NEXT_PUBLIC_SHOPIFY_API_KEY!,
       host,
