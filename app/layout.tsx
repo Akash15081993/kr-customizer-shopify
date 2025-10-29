@@ -10,6 +10,7 @@ import NextProgressBar from "./components/nextProgress";
 import { ShopProvider } from "./contexts/ShopContext";
 import AppBridgeProvider from "./providers/AppBridgeProvider";
 
+
 function InnerProviders({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
   const host = searchParams.get("host");
