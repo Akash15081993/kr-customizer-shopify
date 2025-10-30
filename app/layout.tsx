@@ -9,6 +9,7 @@ import NextProgressBar from "./components/nextProgress";
 import { ShopProvider } from "./contexts/ShopContext";
 import AppBridgeProvider from "./providers/AppBridgeProvider";
 import { useSearchParams } from "next/navigation";
+import Script from "next/script";
 
 function InnerProviders({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
@@ -27,28 +28,15 @@ function InnerProviders({ children }: { children: React.ReactNode }) {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  // ✅ Inject App Bridge manually
-  useEffect(() => {
-    const existing = document.querySelector('script#shopify-appbridge');
-    if (!existing) {
-      const meta = document.createElement("meta");
-      meta.name = "shopify-api-key";
-      meta.content = process.env.NEXT_PUBLIC_SHOPIFY_API_KEY!;
-      document.head.appendChild(meta);
-
-      const script = document.createElement("script");
-      script.id = "shopify-appbridge";
-      script.src = "https://cdn.shopify.com/shopifycloud/app-bridge.js";
-      script.type = "text/javascript";
-      // ⚠️ Do NOT set async/defer — Shopify requires it synchronous
-      document.head.insertBefore(script, document.head.firstChild);
-
-      console.log("✅ App Bridge script injected manually");
-    }
-  }, []);
-
   return (
     <html lang="en">
+      <head>
+        <Script
+          id="shopify-appbridge"
+          src="https://cdn.shopify.com/shopifycloud/app-bridge.js"
+          strategy="beforeInteractive"
+        />
+      </head>
       <body>
         <NextProgressBar />
         <AppProvider i18n={enTranslations}>
