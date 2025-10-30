@@ -23,7 +23,9 @@ function InnerProviders({ children }: { children: React.ReactNode }) {
   if (!host || !shop) {
     return (
       <ShopProvider>
-        <DashboardUI />
+        <div className="container">
+          <DashboardUI />
+        </div>
       </ShopProvider>
     );
   }
