@@ -24,7 +24,7 @@ const DashboardUI = () => (
             Bring your Guns, T-Shirts & Mugs portfolio to life with our
             powerful 3D product customizers.
             </h1>
-            <p style={{ marginTop: "20px", fontSize: "18px" }}>
+            <p style={{ marginTop: "20px", fontSize: "18px", textAlign: "center" }}>
             Easily personalize, visualize, and manage your store’s products
             with <b>{langEng?.appDetails?.name}</b>.
             </p>
