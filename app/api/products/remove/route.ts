@@ -27,6 +27,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
+     //Fetch store info from Shopify API
+    const shopInfo = await ShopInfo(shop, accessToken);
+
+    //Add recode in main table
+    const payload = {
+      "storeHash" : (shopInfo as any)?.id?.toString(),
+      "id":rowId,
+      apiToken: langEng?.storeApi?.token + "-product-delete",
+    }
+
+    await fetch(`${langEng?.storeApi?.endPoint}product/remove`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
     if (
       !metafield.namespace ||
       !metafield.key ||
@@ -101,21 +117,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    //Fetch store info from Shopify API
-    const shopInfo = await ShopInfo(shop, accessToken);
-
-    //Add recode in main table
-    const payload = {
-      "storeHash" : (shopInfo as any)?.id?.toString(),
-      "id":rowId,
-      apiToken: langEng?.storeApi?.token + "-product-delete",
-    }
-
-    await fetch(`${langEng?.storeApi?.endPoint}product/remove`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+   
 
     return NextResponse.json({
       success: true,
