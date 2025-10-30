@@ -31,12 +31,12 @@ function AppBridgeInner({ children }: { children: React.ReactNode }) {
 
         if (typeof window !== "undefined") {
           (window as any).__APP_BRIDGE__ = appInstance;
-          console.info("✅ Shopify AppBridge initialized:", appInstance);
+          //console.info("✅ Shopify AppBridge initialized:", appInstance);
         }
 
         // 🔐 Fetch and verify token
         const token = await getSessionToken(appInstance);
-        console.log("🟢 Received Session Token:", token);
+        //console.log("🟢 Received Session Token:", token);
 
         await fetch("/api/verify", {
           method: "POST",

@@ -1,3 +1,4 @@
+// app/page.tsx
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import Header from "./components/header";
@@ -8,15 +9,12 @@ import langEng from "@/lang/en";
 export default async function Home({
   searchParams,
 }: {
-  searchParams?: Promise<Record<string, string>>;
+  searchParams?: Record<string, string>;
 }) {
-  const params = await searchParams;
-  const shopParam = params?.shop;
-  const hostParam = params?.host;
-  const shop = typeof shopParam === "string" ? shopParam : undefined;
-  const host = typeof hostParam === "string" ? hostParam : undefined;
+  const shop = searchParams?.shop;
+  const host = searchParams?.host;
 
-  // ✅ 1. No shop param → show default dashboard (public view)
+  // 🧭 If no `shop` param → show static default dashboard page
   if (!shop) {
     return (
       <div>
@@ -39,9 +37,9 @@ export default async function Home({
                 Bring your Guns, T-Shirts & Mugs portfolio to life with our
                 powerful 3D product customizers.
               </h1>
-              <p>
-                Empower your Shopify store with real-time, interactive
-                customization tools that drive engagement and boost sales.
+              <p style={{ marginTop: "20px", fontSize: "18px" }}>
+                Easily personalize, visualize, and manage your store’s products
+                with <b>{langEng?.appDetails?.name}</b>.
               </p>
             </div>
           </div>
@@ -50,7 +48,7 @@ export default async function Home({
             <h2>{langEng?.appDetails?.name}</h2>
             <p>
               A variety of packages are offered. Please contact your{" "}
-              <b>{langEng?.appDetails?.name}</b> Account Manager or <br />{" "}
+              <b>{langEng?.appDetails?.name}</b> Account Manager or <br />
               <a href={`mailto:${langEng?.appDetails?.email}`}>
                 {langEng?.appDetails?.email}
               </a>{" "}
@@ -62,14 +60,14 @@ export default async function Home({
     );
   }
 
-  // ✅ 2. Shop param present → check installation state
+  // 🧭 If `shop` param exists → check installation status
   const existingSession = await prisma?.session?.findUnique({ where: { shop } });
 
   if (existingSession) {
     // Shop already installed → go to dashboard
     return redirect(`/dashboard?shop=${encodeURIComponent(shop)}&host=${host}`);
-  } else {
-    // Shop not installed → go to install route
-    return redirect(`/api/auth/install?shop=${encodeURIComponent(shop)}&host=${host}`);
   }
+
+  // Shop not installed → go to install flow
+  return redirect(`/api/auth/install?shop=${encodeURIComponent(shop)}&host=${host}`);
 }
