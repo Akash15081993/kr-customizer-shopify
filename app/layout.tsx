@@ -10,20 +10,26 @@ import NextProgressBar from "./components/nextProgress";
 import { ShopProvider } from "./contexts/ShopContext";
 import AppBridgeProvider from "./providers/AppBridgeProvider";
 
-
 function InnerProviders({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
   const host = searchParams.get("host");
   const shop = searchParams.get("shop");
 
-  //Prevent rendering until Shopify params are available
+  //If not inside Shopify (no shop/host), skip AppBridgeProvider
   if (!host || !shop) {
-    return <div>Loading Shopify context...</div>;
+    return (
+      <ShopProvider>
+        <div className="container">{children}</div>
+      </ShopProvider>
+    );
   }
 
+  //Inside Shopify → wrap with AppBridgeProvider
   return (
     <AppBridgeProvider>
-      <ShopProvider>{children}</ShopProvider>
+      <ShopProvider>
+        <div className="container">{children}</div>
+      </ShopProvider>
     </AppBridgeProvider>
   );
 }
@@ -35,9 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <NextProgressBar />
         <AppProvider i18n={enTranslations}>
           <Suspense fallback={<div>Loading Shopify app...</div>}>
-            <InnerProviders>
-              <div className="container">{children}</div>
-            </InnerProviders>
+            <InnerProviders>{children}</InnerProviders>
           </Suspense>
         </AppProvider>
       </body>
