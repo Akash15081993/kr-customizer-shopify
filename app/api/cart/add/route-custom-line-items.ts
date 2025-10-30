@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     const originalPrice = parseFloat(variant.price);
     const customPrice = originalPrice + fixedPrice;
 
-    // ✅ Single custom line item (no variantId)
+    //  Single custom line item (no variantId)
     const draftOrderMutation = `
       mutation draftOrderCreate($input: DraftOrderInput!) {
         draftOrderCreate(input: $input) {
@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
         title: `${variant.product.title} - ${variant.title}`,
         customPrice,
       },
-      message: `✅ Single item created with custom price ${customPrice}`,
+      message: ` Single item created with custom price ${customPrice}`,
     });
   } catch (error: any) {
     console.error("❌ Error creating draft order:", error);

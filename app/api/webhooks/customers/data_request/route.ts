@@ -21,6 +21,6 @@ export async function POST(req: Request) {
 
   if (hash !== hmac) return NextResponse.json({ error: "Invalid HMAC" }, { status: 401 });
 
-  console.log("✅ customers/data_request received");
+  console.log(" customers/data_request received");
   return NextResponse.json({ success: true });
 }

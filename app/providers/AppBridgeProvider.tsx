@@ -31,7 +31,7 @@ function AppBridgeInner({ children }: { children: React.ReactNode }) {
 
         if (typeof window !== "undefined") {
           (window as any).__APP_BRIDGE__ = appInstance;
-          //console.info("✅ Shopify AppBridge initialized:", appInstance);
+          //console.info(" Shopify AppBridge initialized:", appInstance);
         }
 
         // 🔐 Fetch and verify token

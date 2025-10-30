@@ -15,10 +15,9 @@ export async function POST(request: Request) {
 
     const token = authHeader.replace("Bearer ", "");
 
-    // ✅ Verify JWT signature from Shopify
+    //Verify JWT signature from Shopify
     const decoded = jwt.verify(token, SHOPIFY_API_SECRET);
-    console.log("✅ Verified Shopify token:", decoded);
-
+    
     return NextResponse.json({ success: true, message: "Token verified", decoded });
   } catch (err: any) {
     console.error("❌ Token verification failed:", err.message);

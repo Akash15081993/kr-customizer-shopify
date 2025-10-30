@@ -9,6 +9,7 @@ import enTranslations from "@shopify/polaris/locales/en.json";
 import NextProgressBar from "./components/nextProgress";
 import { ShopProvider } from "./contexts/ShopContext";
 import AppBridgeProvider from "./providers/AppBridgeProvider";
+import DashboardUI from "./components/dashboard";
 
 
 function InnerProviders({ children }: { children: React.ReactNode }) {
@@ -16,9 +17,9 @@ function InnerProviders({ children }: { children: React.ReactNode }) {
   const host = searchParams.get("host");
   const shop = searchParams.get("shop");
 
-  // ✅ Prevent rendering until Shopify params are available
+  //Prevent rendering until Shopify params are available
   if (!host || !shop) {
-    return <div>Loading Shopify context...</div>;
+    return <DashboardUI />;
   }
 
   return (

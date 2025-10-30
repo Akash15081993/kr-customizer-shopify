@@ -35,7 +35,7 @@ DATABASE_URL="mysql://admin_shopify:Shopify@2025@localhost/admin_shopify"
 
 # read_script_tags, write_script_tags: Needed for injecting your frontend widget into storefronts.
 
-# ✅ So this list is Shopify-acceptable for a legitimate product customizer app.
+#  So this list is Shopify-acceptable for a legitimate product customizer app.
 
 
 #--------------------------------------
