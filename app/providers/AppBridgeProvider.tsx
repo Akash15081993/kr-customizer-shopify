@@ -2,7 +2,8 @@
 
 import React, { createContext, useContext, useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import createApp from "@shopify/app-bridge"; // ✅ Import directly
+import createApp from "@shopify/app-bridge";
+import { getSessionToken } from "@shopify/app-bridge-utils";
 
 const AppBridgeReactContext = createContext<any>(null);
 
@@ -17,54 +18,64 @@ function AppBridgeInner({ children }: { children: React.ReactNode }) {
   const [app, setApp] = useState<any>(null);
 
   useEffect(() => {
-    const host = searchParams.get("host");
-    if (!host) return;
+    const initAppBridge = async () => {
+      const host = searchParams.get("host");
+      if (!host) return;
 
-    try {
-      const appInstance = createApp({
-        apiKey: process.env.NEXT_PUBLIC_SHOPIFY_API_KEY!,
-        host,
-        forceRedirect: true,
-      });
+      try {
+        const appInstance = createApp({
+          apiKey: process.env.NEXT_PUBLIC_SHOPIFY_API_KEY!,
+          host,
+          forceRedirect: true,
+        });
 
-      // ✅ Attach globally for debugging
-      if (typeof window !== "undefined") {
-        (window as any).__APP_BRIDGE__ = appInstance;
-        console.info("✅ Shopify AppBridge initialized:", appInstance);
+        if (typeof window !== "undefined") {
+          (window as any).__APP_BRIDGE__ = appInstance;
+          console.info("✅ Shopify AppBridge initialized:", appInstance);
+        }
+
+        // 🔐 Fetch and verify token
+        const token = await getSessionToken(appInstance);
+        console.log("🟢 Received Session Token:", token);
+
+        await fetch("/api/verify", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        appInstance.subscribe("*", (event) => {
+          console.log("📡 AppBridge event:", event);
+        });
+
+        setApp(appInstance);
+      } catch (err) {
+        console.error("❌ Failed to initialize Shopify AppBridge:", err);
       }
+    };
 
-      appInstance.subscribe("*", (event) => {
-        console.log("🟢 AppBridge event:", event);
-      });
-
-      setApp(appInstance);
-    } catch (err) {
-      console.error("❌ Failed to initialize Shopify AppBridge:", err);
-    }
+    initAppBridge();
   }, [searchParams]);
 
   if (!app) {
     return (
-      <div style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        height: "100vh",
-        background: "#f6f6f7",
-        color: "#000000",
-        fontSize: "26px",
-        fontFamily: "system-ui, sans-serif"
-      }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+          background: "#f6f6f7",
+          color: "#000000",
+          fontSize: "22px",
+          fontFamily: "system-ui, sans-serif",
+        }}
+      >
         Initializing KR Customizer...
       </div>
     );
   }
 
-  return (
-    <AppBridgeReactContext.Provider value={app}>
-      {children}
-    </AppBridgeReactContext.Provider>
-  );
+  return <AppBridgeReactContext.Provider value={app}>{children}</AppBridgeReactContext.Provider>;
 }
 
 export default function AppBridgeProvider({ children }: { children: React.ReactNode }) {
