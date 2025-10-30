@@ -20,15 +20,12 @@ function InnerProviders({ children }: { children: React.ReactNode }) {
 
   return (
     <AppBridgeProvider>
-      <ShopProvider>
-        <div className="container">{children}</div>
-      </ShopProvider>
+      <ShopProvider>{children}</ShopProvider>
     </AppBridgeProvider>
   );
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  
   return (
     <html lang="en">
       <head>
