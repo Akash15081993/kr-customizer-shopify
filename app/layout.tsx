@@ -30,13 +30,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <head>
         <meta name="shopify-api-key" content={process.env.NEXT_PUBLIC_SHOPIFY_API_KEY} />
-        <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
+        <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js" async></script>
       </head>
       <body>
         <NextProgressBar />
         <AppProvider i18n={enTranslations}>
           <Suspense fallback={<div>Loading Shopify app...</div>}>
-            <InnerProviders>{children}</InnerProviders>
+            <InnerProviders>
+              <div className="container">{children}</div>
+            </InnerProviders>
           </Suspense>
         </AppProvider>
       </body>
