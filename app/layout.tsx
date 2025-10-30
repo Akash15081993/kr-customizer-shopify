@@ -9,7 +9,6 @@ import enTranslations from "@shopify/polaris/locales/en.json";
 import NextProgressBar from "./components/nextProgress";
 import { ShopProvider } from "./contexts/ShopContext";
 import AppBridgeProvider from "./providers/AppBridgeProvider";
-import DashboardUI from "./components/dashboard";
 
 
 function InnerProviders({ children }: { children: React.ReactNode }) {
@@ -19,7 +18,7 @@ function InnerProviders({ children }: { children: React.ReactNode }) {
 
   //Prevent rendering until Shopify params are available
   if (!host || !shop) {
-    return <DashboardUI />;
+    return <div>Loading Shopify context...</div>;
   }
 
   return (
