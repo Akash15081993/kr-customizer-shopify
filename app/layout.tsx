@@ -9,8 +9,6 @@ import NextProgressBar from "./components/nextProgress";
 import { ShopProvider } from "./contexts/ShopContext";
 import AppBridgeProvider from "./providers/AppBridgeProvider";
 import { useSearchParams } from "next/navigation";
-import { NavMenu } from "@shopify/app-bridge-react";
-import { Link } from "@bigcommerce/big-design";
 
 function InnerProviders({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
@@ -29,17 +27,16 @@ function InnerProviders({ children }: { children: React.ReactNode }) {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  
   return (
     <html lang="en">
+      <head>
+        <meta name="shopify-api-key" content={process.env.NEXT_PUBLIC_SHOPIFY_API_KEY} />
+        <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
+      </head>
       <body>
         <NextProgressBar />
         <AppProvider i18n={enTranslations}>
-          <NavMenu>
-            <Link href="/app" rel="home">
-              Home
-            </Link>
-            <Link href="/app/additional">Additional page</Link>
-          </NavMenu>
           <Suspense fallback={<div>Loading Shopify app...</div>}>
             <InnerProviders>{children}</InnerProviders>
           </Suspense>
