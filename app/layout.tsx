@@ -9,6 +9,8 @@ import NextProgressBar from "./components/nextProgress";
 import { ShopProvider } from "./contexts/ShopContext";
 import AppBridgeProvider from "./providers/AppBridgeProvider";
 import { useSearchParams } from "next/navigation";
+import { NavMenu } from "@shopify/app-bridge-react";
+import { Link } from "@bigcommerce/big-design";
 
 function InnerProviders({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
@@ -32,6 +34,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <NextProgressBar />
         <AppProvider i18n={enTranslations}>
+          <NavMenu>
+            <Link href="/app" rel="home">
+              Home
+            </Link>
+            <Link href="/app/additional">Additional page</Link>
+          </NavMenu>
           <Suspense fallback={<div>Loading Shopify app...</div>}>
             <InnerProviders>{children}</InnerProviders>
           </Suspense>
