@@ -8,7 +8,6 @@ import enTranslations from "@shopify/polaris/locales/en.json";
 import NextProgressBar from "./components/nextProgress";
 import { ShopProvider } from "./contexts/ShopContext";
 import AppBridgeProvider from "./providers/AppBridgeProvider";
-import Script from "next/script";
 import { useSearchParams } from "next/navigation";
 
 function InnerProviders({ children }: { children: React.ReactNode }) {
@@ -30,12 +29,6 @@ function InnerProviders({ children }: { children: React.ReactNode }) {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <head>
-        {/* ✅ Required for Shopify embed check */}
-        <meta name="shopify-api-key" content={process.env.NEXT_PUBLIC_SHOPIFY_API_KEY} />
-        <Script src="https://cdn.shopify.com/shopifycloud/app-bridge.js" strategy="beforeInteractive" />
-      </head>
-
       <body>
         <NextProgressBar />
         <AppProvider i18n={enTranslations}>
