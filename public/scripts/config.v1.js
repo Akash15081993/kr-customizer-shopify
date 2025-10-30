@@ -365,7 +365,6 @@ document.addEventListener("click", async (e) => {
   
   if (!validateForm(ele_product_form_addtocart)) return;
 
-  window?.setCustomizerLoading(true);
   const krDesignData = JSON.parse(localStorage.getItem("krDesignData") || "{}");
   const kr_design_id = krDesignData?.krDesignId;
 
@@ -377,6 +376,7 @@ document.addEventListener("click", async (e) => {
   }
 
   try {
+    window?.setCustomizerLoading(true);
     const variant = getCurrentVariant();
     const variantId = `gid://shopify/ProductVariant/${variant?.id}`;
     const quantity = document.querySelector('form [name="quantity"]')?.value || 1;

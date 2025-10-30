@@ -1,3 +1,4 @@
+//app\components\dashboard.tsx
 import Header from './header';
 import Image from 'next/image';
 import stylesPage from "../../assets/css/dashboard.module.css";

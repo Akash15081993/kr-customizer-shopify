@@ -8,14 +8,24 @@ import NextProgressBar from "./components/nextProgress";
 import { ShopProvider } from "./contexts/ShopContext";
 import AppBridgeProvider from "./providers/AppBridgeProvider";
 import { useSearchParams } from "next/navigation";
+import DashboardUI from "./components/dashboard";
 
 function InnerProviders({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
   const host = searchParams.get("host");
   const shop = searchParams.get("shop");
 
+  // if (!host || !shop) {
+  //   return <div>Loading Shopify context...</div>;
+  // }
+
+  //When app opened directly (no Shopify context)
   if (!host || !shop) {
-    return <div>Loading Shopify context...</div>;
+    return (
+      <ShopProvider>
+        <DashboardUI />
+      </ShopProvider>
+    );
   }
 
   return (
